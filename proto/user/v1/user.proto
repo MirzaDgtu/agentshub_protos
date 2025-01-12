@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package user.v1;
+
+option go_package = "github.com/MirzaDgtu/agentshub_proto/gen/go/user/v1;userv1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// UserService предоставляет методы для управления пользователями
+service UserService {
+    // User CRUD operations
+    rpc CreateUser(CreateUserRequest) returns (UserResponse) {}
+    rpc GetUser(GetUserRequest) returns (UserResponse) {}
+    rpc UpdateUser(UpdateUserRequest) returns (UserResponse) {}
+    rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {}
+    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {}
+    
+    // Role management
+    rpc AssignRole(AssignRoleRequest) returns (UserResponse) {}
+    rpc RemoveRole(RemoveRoleRequest) returns (UserResponse) {}
+    rpc ListUserRoles(GetUserRequest) returns (ListRolesResponse) {}
+    
+    // User status management
+    rpc BlockUser(BlockUserRequest) returns (UserResponse) {}
+    rpc UnblockUser(UnblockUserRequest) returns (UserResponse) {}
+}
+
+message User {
+    int64 id = 1;
+    string email = 2;
+    string first_name = 3;
+    string middle_name = 4;
+    string last_name = 5;
+    string profile_image_url = 6;
+    bool is_blocked = 7;
+    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 9;
+    repeated Role roles = 10;
+}
+
+message Role {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    repeated Permission permissions = 4;
+}
+
+message Permission {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+}
+
+message CreateUserRequest {
+    string email = 1;
+    string password = 2;
+    string first_name = 3;
+    string middle_name = 4;
+    string last_name = 5;
+}
+
+message GetUserRequest {
+    int64 user_id = 1;
+}
+
+message UpdateUserRequest {
+    int64 user_id = 1;
+    optional string first_name = 2;
+    optional string middle_name = 3;
+    optional string last_name = 4;
+    optional string profile_image_url = 5;
+}
+
+message DeleteUserRequest {
+    int64 user_id = 1;
+}
+
+message ListUsersRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+    string filter = 3;
+}
+
+message ListUsersResponse {
+    repeated User users = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+message AssignRoleRequest {
+    int64 user_id = 1;
+    int64 role_id = 2;
+}
+
+message RemoveRoleRequest {
+    int64 user_id = 1;
+    int64 role_id = 2;
+}
+
+message ListRolesResponse {
+    repeated Role roles = 1;
+}
+
+message BlockUserRequest {
+    int64 user_id = 1;
+}
+
+message UnblockUserRequest {
+    int64 user_id = 1;
+}
+
+message UserResponse {
+    User user = 1;
+}

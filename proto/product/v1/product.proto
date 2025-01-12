@@ -1,0 +1,217 @@
+syntax = "proto3";
+
+package product.v1;
+
+option go_package = "github.com/MirzaDgtu/agentshub_proto/gen/go/product/v1;productv1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// ProductService предоставляет методы для работы с продуктами и ценами
+service ProductService {
+    // Product management
+    rpc CreateProduct(CreateProductRequest) returns (ProductResponse) {}
+    rpc GetProduct(GetProductRequest) returns (ProductResponse) {}
+    rpc UpdateProduct(UpdateProductRequest) returns (ProductResponse) {}
+    rpc DeleteProduct(DeleteProductRequest) returns (google.protobuf.Empty) {}
+    rpc ListProducts(ListProductsRequest) returns (ListProductsResponse) {}
+    
+    // Price management
+    rpc SetPrice(SetPriceRequest) returns (PriceResponse) {}
+    rpc GetPrice(GetPriceRequest) returns (PriceResponse) {}
+    rpc GetPriceHistory(GetPriceHistoryRequest) returns (PriceHistoryResponse) {}
+    
+    // Discount management
+    rpc CreateDiscount(CreateDiscountRequest) returns (DiscountResponse) {}
+    rpc UpdateDiscount(UpdateDiscountRequest) returns (DiscountResponse) {}
+    rpc DeleteDiscount(DeleteDiscountRequest) returns (google.protobuf.Empty) {}
+    rpc ListDiscounts(ListDiscountsRequest) returns (ListDiscountsResponse) {}
+    
+    // Category management
+    rpc CreateCategory(CreateCategoryRequest) returns (CategoryResponse) {}
+    rpc UpdateCategory(UpdateCategoryRequest) returns (CategoryResponse) {}
+    rpc DeleteCategory(DeleteCategoryRequest) returns (google.protobuf.Empty) {}
+    rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse) {}
+}
+
+message Product {
+    int64 id = 1;
+    string name = 2;
+    string code = 3;
+    string barcode = 4;
+    string description = 5;
+    int64 category_id = 6;
+    string unit = 7;
+    double weight = 8;
+    double volume = 9;
+    ProductStatus status = 10;
+    repeated string image_urls = 11;
+    map<string, string> attributes = 12;
+    google.protobuf.Timestamp created_at = 13;
+    google.protobuf.Timestamp updated_at = 14;
+}
+
+enum ProductStatus {
+    PRODUCT_STATUS_UNSPECIFIED = 0;
+    PRODUCT_STATUS_ACTIVE = 1;
+    PRODUCT_STATUS_INACTIVE = 2;
+    PRODUCT_STATUS_DISCONTINUED = 3;
+}
+
+message Price {
+    int64 id = 1;
+    int64 product_id = 2;
+    int64 price_list_id = 3;
+    double base_price = 4;
+    string currency = 5;
+    google.protobuf.Timestamp valid_from = 6;
+    google.protobuf.Timestamp valid_to = 7;
+}
+
+message Discount {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    DiscountType type = 4;
+    double value = 5;
+    google.protobuf.Timestamp start_date = 6;
+    google.protobuf.Timestamp end_date = 7;
+    repeated int64 product_ids = 8;
+    repeated int64 category_ids = 9;
+    repeated int64 client_ids = 10;
+    int32 min_quantity = 11;
+    double min_amount = 12;
+}
+
+enum DiscountType {
+    DISCOUNT_TYPE_UNSPECIFIED = 0;
+    DISCOUNT_TYPE_PERCENTAGE = 1;
+    DISCOUNT_TYPE_FIXED_AMOUNT = 2;
+}
+
+message Category {
+    int64 id = 1;
+    int64 parent_id = 2;
+    string name = 3;
+    string description = 4;
+    string image_url = 5;
+    int32 sort_order = 6;
+}
+
+message CreateProductRequest {
+    Product product = 1;
+}
+
+message GetProductRequest {
+    int64 product_id = 1;
+}
+
+message UpdateProductRequest {
+    Product product = 1;
+}
+
+message DeleteProductRequest {
+    int64 product_id = 1;
+}
+
+message ListProductsRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+    string filter = 3;
+    repeated int64 category_ids = 4;
+    repeated ProductStatus statuses = 5;
+}
+
+message ListProductsResponse {
+    repeated Product products = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+message SetPriceRequest {
+    Price price = 1;
+}
+
+message GetPriceRequest {
+    int64 product_id = 1;
+    int64 price_list_id = 2;
+    google.protobuf.Timestamp at_date = 3;
+}
+
+message GetPriceHistoryRequest {
+    int64 product_id = 1;
+    int64 price_list_id = 2;
+    google.protobuf.Timestamp start_date = 3;
+    google.protobuf.Timestamp end_date = 4;
+}
+
+message PriceHistoryResponse {
+    repeated Price prices = 1;
+}
+
+message CreateDiscountRequest {
+    Discount discount = 1;
+}
+
+message UpdateDiscountRequest {
+    Discount discount = 1;
+}
+
+message DeleteDiscountRequest {
+    int64 discount_id = 1;
+}
+
+message ListDiscountsRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+    bool active_only = 3;
+    repeated int64 product_ids = 4;
+    repeated int64 category_ids = 5;
+    repeated int64 client_ids = 6;
+}
+
+message ListDiscountsResponse {
+    repeated Discount discounts = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+message CreateCategoryRequest {
+    Category category = 1;
+}
+
+message UpdateCategoryRequest {
+    Category category = 1;
+}
+
+message DeleteCategoryRequest {
+    int64 category_id = 1;
+}
+
+message ListCategoriesRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+    int64 parent_id = 3;
+}
+
+message ListCategoriesResponse {
+    repeated Category categories = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+message ProductResponse {
+    Product product = 1;
+}
+
+message PriceResponse {
+    Price price = 1;
+}
+
+message DiscountResponse {
+    Discount discount = 1;
+}
+
+message CategoryResponse {
+    Category category = 1;
+}
