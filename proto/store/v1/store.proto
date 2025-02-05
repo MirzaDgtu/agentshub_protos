@@ -1,0 +1,206 @@
+syntax = "proto3";
+
+package store.v1;
+
+option go_package = "github.com/MirzaDgtu/agentshub_proto/gen/go/store/v1;storev1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// StoreService предоставляет методы для работы с торговыми точками
+service StoreService {
+    // Store management
+    rpc CreateStore(CreateStoreRequest) returns (StoreResponse) {}
+    rpc GetStore(GetStoreRequest) returns (StoreResponse) {}
+    rpc UpdateStore(UpdateStoreRequest) returns (StoreResponse) {}
+    rpc DeleteStore(DeleteStoreRequest) returns (google.protobuf.Empty) {}
+    rpc ListStores(ListStoresRequest) returns (ListStoresResponse) {}
+    
+    // Store visits
+    rpc RecordStoreVisit(RecordStoreVisitRequest) returns (StoreVisitResponse) {}
+    rpc GetStoreVisits(GetStoreVisitsRequest) returns (ListStoreVisitsResponse) {}
+    rpc UpdateStoreVisit(UpdateStoreVisitRequest) returns (StoreVisitResponse) {}
+    
+    // Store photos
+    rpc AddStorePhoto(AddStorePhotoRequest) returns (StorePhotoResponse) {}
+    rpc DeleteStorePhoto(DeleteStorePhotoRequest) returns (google.protobuf.Empty) {}
+    rpc ListStorePhotos(ListStorePhotosRequest) returns (ListStorePhotosResponse) {}
+    
+    // Store analytics
+    rpc GetStoreStats(GetStoreStatsRequest) returns (StoreStatsResponse) {}
+    rpc GetVisitStats(GetVisitStatsRequest) returns (VisitStatsResponse) {}
+}
+
+message Store {
+    int64 id = 1;
+    int64 client_id = 2;
+    string store_name = 3;
+    string address = 4;
+    string city = 5;
+    string state = 6;
+    string zip_code = 7;
+    double latitude = 8;
+    double longitude = 9;
+    string working_hours = 10;
+    StoreStatus status = 11;
+    google.protobuf.Timestamp created_at = 12;
+    google.protobuf.Timestamp updated_at = 13;
+}
+
+enum StoreStatus {
+    STORE_STATUS_UNSPECIFIED = 0;
+    STORE_STATUS_ACTIVE = 1;
+    STORE_STATUS_INACTIVE = 2;
+    STORE_STATUS_TEMPORARY_CLOSED = 3;
+}
+
+message StoreVisit {
+    int64 id = 1;
+    int64 store_id = 2;
+    int64 user_id = 3;
+    google.protobuf.Timestamp visit_time = 4;
+    VisitStatus status = 5;
+    string notes = 6;
+    repeated string photo_urls = 7;
+    Location check_in_location = 8;
+}
+
+enum VisitStatus {
+    VISIT_STATUS_UNSPECIFIED = 0;
+    VISIT_STATUS_PLANNED = 1;
+    VISIT_STATUS_IN_PROGRESS = 2;
+    VISIT_STATUS_COMPLETED = 3;
+    VISIT_STATUS_MISSED = 4;
+    VISIT_STATUS_CANCELLED = 5;
+}
+
+message Location {
+    double latitude = 1;
+    double longitude = 2;
+    float accuracy = 3;
+}
+
+message StorePhoto {
+    int64 id = 1;
+    int64 store_id = 2;
+    string photo_url = 3;
+    string photo_type = 4;  // exterior, interior, showcase, etc.
+    string description = 5;
+    google.protobuf.Timestamp created_at = 6;
+}
+
+message CreateStoreRequest {
+    Store store = 1;
+}
+
+message GetStoreRequest {
+    int64 store_id = 1;
+}
+
+message UpdateStoreRequest {
+    Store store = 1;
+}
+
+message DeleteStoreRequest {
+    int64 store_id = 1;
+}
+
+message ListStoresRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+    string filter = 3;
+    int64 client_id = 4;
+    repeated StoreStatus statuses = 5;
+}
+
+message ListStoresResponse {
+    repeated Store stores = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+message RecordStoreVisitRequest {
+    StoreVisit visit = 1;
+}
+
+message GetStoreVisitsRequest {
+    int64 store_id = 1;
+    google.protobuf.Timestamp start_date = 2;
+    google.protobuf.Timestamp end_date = 3;
+    int32 page_size = 4;
+    string page_token = 5;
+}
+
+message ListStoreVisitsResponse {
+    repeated StoreVisit visits = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+message UpdateStoreVisitRequest {
+    StoreVisit visit = 1;
+}
+
+message AddStorePhotoRequest {
+    int64 store_id = 1;
+    string photo_type = 2;
+    string description = 3;
+    string photo_url = 4;  // URL from MediaService
+}
+
+message DeleteStorePhotoRequest {
+    int64 photo_id = 1;
+}
+
+message ListStorePhotosRequest {
+    int64 store_id = 1;
+    string photo_type = 2;
+    int32 page_size = 3;
+    string page_token = 4;
+}
+
+message ListStorePhotosResponse {
+    repeated StorePhoto photos = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+message GetStoreStatsRequest {
+    int64 store_id = 1;
+    google.protobuf.Timestamp start_date = 2;
+    google.protobuf.Timestamp end_date = 3;
+}
+
+message StoreStatsResponse {
+    int32 total_visits = 1;
+    int32 completed_visits = 2;
+    int32 missed_visits = 3;
+    float avg_visit_duration = 4;
+    map<string, int32> visit_by_status = 5;
+}
+
+message GetVisitStatsRequest {
+    int64 user_id = 1;
+    google.protobuf.Timestamp start_date = 2;
+    google.protobuf.Timestamp end_date = 3;
+}
+
+message VisitStatsResponse {
+    int32 total_visits = 1;
+    int32 completed_visits = 2;
+    int32 stores_visited = 3;
+    float avg_visits_per_day = 4;
+    map<string, int32> visits_by_day = 5;
+}
+
+message StoreResponse {
+    Store store = 1;
+}
+
+message StoreVisitResponse {
+    StoreVisit visit = 1;
+}
+
+message StorePhotoResponse {
+    StorePhoto photo = 1;
+}

@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package auth.v1;
+
+option go_package = "github.com/MirzaDgtu/agentshub_proto/gen/go/auth/v1;authv1";
+
+import "google/protobuf/timestamp.proto";
+
+// AuthService предоставляет методы для аутентификации и авторизации
+service AuthService {
+    // Login аутентифицирует пользователя и возвращает токены
+    rpc Login(LoginRequest) returns (LoginResponse) {}
+
+    // Logout завершает сессию пользователя
+    rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+
+    // Refresh обновляет access token
+    rpc Refresh(RefreshRequest) returns (RefreshResponse) {}
+
+    // Validate проверяет валидность токена
+    rpc Validate(ValidateRequest) returns (ValidateResponse) {}
+
+    // VerifyPermissions проверяет права доступа
+    rpc VerifyPermissions(VerifyPermissionsRequest) returns (VerifyPermissionsResponse) {}
+}
+
+message LoginRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+    google.protobuf.Timestamp expires_at = 3;
+    UserInfo user = 4;
+}
+
+message UserInfo {
+    int64 id = 1;
+    string email = 2;
+    repeated string permissions = 3;
+}
+
+message LogoutRequest {
+    string access_token = 1;
+}
+
+message LogoutResponse {
+    bool success = 1;
+}
+
+message RefreshRequest {
+    string refresh_token = 1;
+}
+
+message RefreshResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+    google.protobuf.Timestamp expires_at = 3;
+}
+
+message ValidateRequest {
+    string token = 1;
+}
+
+message ValidateResponse {
+    bool valid = 1;
+    UserInfo user = 2;
+}
+
+message VerifyPermissionsRequest {
+    string access_token = 1;
+    repeated string required_permissions = 2;
+}
+
+message VerifyPermissionsResponse {
+    bool has_access = 1;
+}

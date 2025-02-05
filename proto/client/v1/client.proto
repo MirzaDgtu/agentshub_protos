@@ -1,0 +1,187 @@
+syntax = "proto3";
+
+package client.v1;
+
+option go_package = "github.com/MirzaDgtu/agentshub_proto/gen/go/client/v1;clientv1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service ClientService {
+    // Client management
+    rpc CreateClient(CreateClientRequest) returns (ClientResponse) {}
+    rpc GetClient(GetClientRequest) returns (ClientResponse) {}
+    rpc UpdateClient(UpdateClientRequest) returns (ClientResponse) {}
+    rpc DeleteClient(DeleteClientRequest) returns (google.protobuf.Empty) {}
+    rpc ListClients(ListClientsRequest) returns (ListClientsResponse) {}
+
+    // Contact person management
+    rpc AddContactPerson(AddContactPersonRequest) returns (ContactPersonResponse) {}
+    rpc UpdateContactPerson(UpdateContactPersonRequest) returns (ContactPersonResponse) {}
+    rpc DeleteContactPerson(DeleteContactPersonRequest) returns (google.protobuf.Empty) {}
+    rpc ListContactPersons(ListContactPersonsRequest) returns (ListContactPersonsResponse) {}
+
+    // Contract management
+    rpc CreateContract(CreateContractRequest) returns (ContractResponse) {}
+    rpc UpdateContract(UpdateContractRequest) returns (ContractResponse) {}
+    rpc GetContract(GetContractRequest) returns (ContractResponse) {}
+    rpc ListContracts(ListContractsRequest) returns (ListContractsResponse) {}
+    rpc AddContractAttachment(AddContractAttachmentRequest) returns (ContractAttachmentResponse) {}
+}
+
+// Common models
+message Client {
+    int64 id = 1;
+    string client_name = 2;
+    string short_client_name = 3;
+    string email = 4;
+    string phone_number = 5;
+    string address = 6;
+    string legal_address = 7;
+    string city = 8;
+    string state = 9;
+    string zip_code = 10;
+    string country = 11;
+    int64 type_id = 12;
+    int64 category_id = 13;
+    string inn = 14;
+    string kpp = 15;
+    string okpo_code = 16;
+    string ogrn = 17;
+    double latitude = 18;
+    double longitude = 19;
+    google.protobuf.Timestamp created_at = 20;
+}
+
+message ContactPerson {
+    int64 id = 1;
+    int64 client_id = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string email = 5;
+    string phone_number = 6;
+    int64 position_id = 7;
+}
+
+message Contract {
+    int64 id = 1;
+    int64 client_id = 2;
+    string contract_number = 3;
+    google.protobuf.Timestamp start_date = 4;
+    google.protobuf.Timestamp end_date = 5;
+    int64 status_id = 6;
+    string description = 7;
+    repeated ContractAttachment attachments = 8;
+}
+
+message ContractAttachment {
+    int64 id = 1;
+    string attachment_name = 2;
+    string attachment_type = 3;
+    string attachment_url = 4;
+    google.protobuf.Timestamp upload_date = 5;
+}
+
+// Request/Response messages for client operations
+message CreateClientRequest {
+    Client client = 1;
+}
+
+message GetClientRequest {
+    int64 client_id = 1;
+}
+
+message UpdateClientRequest {
+    Client client = 1;
+}
+
+message DeleteClientRequest {
+    int64 client_id = 1;
+}
+
+message ListClientsRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+    string filter = 3;
+    repeated int64 type_ids = 4;
+    repeated int64 category_ids = 5;
+}
+
+// Request/Response messages for contact person operations
+message AddContactPersonRequest {
+    ContactPerson contact_person = 1;
+}
+
+message UpdateContactPersonRequest {
+    ContactPerson contact_person = 1;
+}
+
+message DeleteContactPersonRequest {
+    int64 contact_person_id = 1;
+}
+
+message ListContactPersonsRequest {
+    int64 client_id = 1;
+    int32 page_size = 2;
+    string page_token = 3;
+}
+
+// Request/Response messages for contract operations
+message CreateContractRequest {
+    Contract contract = 1;
+}
+
+message UpdateContractRequest {
+    Contract contract = 1;
+}
+
+message GetContractRequest {
+    int64 contract_id = 1;
+}
+
+message ListContractsRequest {
+    int64 client_id = 1;
+    int32 page_size = 2;
+    string page_token = 3;
+    repeated int64 status_ids = 4;
+}
+
+message AddContractAttachmentRequest {
+    int64 contract_id = 1;
+    ContractAttachment attachment = 2;
+}
+
+// Response messages
+message ClientResponse {
+    Client client = 1;
+}
+
+message ListClientsResponse {
+    repeated Client clients = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+message ContactPersonResponse {
+    ContactPerson contact_person = 1;
+}
+
+message ListContactPersonsResponse {
+    repeated ContactPerson contact_persons = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+message ContractResponse {
+    Contract contract = 1;
+}
+
+message ListContractsResponse {
+    repeated Contract contracts = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+message ContractAttachmentResponse {
+    ContractAttachment attachment = 1;
+}
